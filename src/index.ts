@@ -31,6 +31,15 @@ client.once('ready', () => {
   console.log(`Syncing messages between channels: ${CHANNEL_1_ID} <-> ${CHANNEL_2_ID}`);
 });
 
+function sanitizeMentions(content: string): string {
+  return content
+    .replace(/@everyone/g, '@\u200beveryone')
+    .replace(/@here/g, '@\u200bhere')
+    .replace(/<@!?(\d+)>/g, '@\u200buser')
+    .replace(/<@&(\d+)>/g, '@\u200brole')
+    .replace(/<#(\d+)>/g, '#\u200bchannel');
+}
+
 client.on('messageCreate', async (message: Message) => {
   if (message.author.bot) return;
 
@@ -47,12 +56,15 @@ client.on('messageCreate', async (message: Message) => {
       targetWebhook = webhook1;
     }
 
+    const sanitizedContent = message.content ? sanitizeMentions(message.content) : undefined;
+
     await targetWebhook.send({
-      content: message.content || undefined,
+      content: sanitizedContent,
       username: message.member?.nickname ? `${message.member.nickname} (${message.author.username})` : `${message.author.displayName} (${message.author.username})`,
       avatarURL: message.author.displayAvatarURL(),
       embeds: message.embeds,
-      files: message.attachments.map(attachment => attachment.url)
+      files: message.attachments.map(attachment => attachment.url),
+      allowedMentions: { parse: [] }
     });
 
     console.log(`Synced message from ${message.channel.id} to ${message.channel.id === CHANNEL_1_ID ? CHANNEL_2_ID : CHANNEL_1_ID}`);

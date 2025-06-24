@@ -1,7 +1,6 @@
 services:
   discord-bot:
     build: .
-    container_name: discord-chat-sync
     restart: unless-stopped
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
