@@ -1,0 +1,13 @@
+services:
+  discord-bot:
+    build: .
+    container_name: discord-chat-sync
+    restart: unless-stopped
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - CHANNEL_1_ID=${CHANNEL_1_ID}
+      - CHANNEL_2_ID=${CHANNEL_2_ID}
+      - WEBHOOK_1_URL=${WEBHOOK_1_URL}
+      - WEBHOOK_2_URL=${WEBHOOK_2_URL}
+    volumes:
+      - ./logs:/app/logs
